@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter
 from app.core.config import settings
 from app.database.session import check_db_connection
+from app.services.vector_store import vector_store_service
 from app.schemas.health import (
     HealthResponse,
     DatabaseHealth,
@@ -18,10 +19,10 @@ def get_health() -> HealthResponse:
     db_type = "sqlite" if settings.DATABASE_URL.startswith("sqlite") else "postgresql"
     db_message = "Connected to persistent database" if db_connected else "Database connection failed"
 
-    # 2. Vector DB directory and status check
-    chroma_path = settings.resolve_path(settings.CHROMA_PERSIST_DIRECTORY)
-    vector_configured = chroma_path.exists()
-    vector_status = "Storage directory ready" if vector_configured else "Directory pending creation"
+    # 2. Vector DB client check
+    chroma_healthy = vector_store_service.is_healthy()
+    chroma_path = vector_store_service.persist_directory
+    vector_status = "ChromaDB persistent client online" if chroma_healthy else "ChromaDB connection error"
 
     # 3. LLM configuration check (Never reveal secret key)
     llm_configured = bool(settings.GEMINI_API_KEY and len(settings.GEMINI_API_KEY.strip()) > 0)
@@ -46,7 +47,7 @@ def get_health() -> HealthResponse:
             message=db_message,
         ),
         vector_db=VectorDBHealth(
-            configured=vector_configured,
+            configured=chroma_healthy,
             persist_dir=str(chroma_path),
             status=vector_status,
         ),

@@ -13,6 +13,7 @@ from app.core.config import settings
 from app.api.router import api_router
 from app.database.session import engine
 from app.database.base import Base
+import app.models  # Register all models in SQLAlchemy metadata
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
