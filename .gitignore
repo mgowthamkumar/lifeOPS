@@ -54,6 +54,7 @@ data/chroma/*
 *.db
 
 # IDE & OS
+.kilo/
 .vscode/
 .idea/
 *.swp

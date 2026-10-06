@@ -8,6 +8,13 @@ from pydantic_settings import BaseSettings
 # Base directory for the project
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
+import sys
+
+# Ensure backend root is in sys.path
+backend_dir = (BASE_DIR / "backend").resolve()
+if str(backend_dir) not in sys.path:
+    sys.path.insert(0, str(backend_dir))
+
 class Settings(BaseSettings):
     APP_NAME: str = "LifeOps AI"
     APP_ENV: str = "development"
@@ -53,6 +60,16 @@ class Settings(BaseSettings):
         if not path.is_absolute():
             return (BASE_DIR / path).resolve()
         return path
+
+    def get_database_url(self) -> str:
+        """Returns database URL with absolute file path for SQLite."""
+        if self.DATABASE_URL.startswith("sqlite:///./") or self.DATABASE_URL.startswith("sqlite:////"):
+            # Extract relative path after sqlite:///
+            rel_part = self.DATABASE_URL.replace("sqlite:///", "")
+            abs_path = self.resolve_path(rel_part)
+            abs_path.parent.mkdir(parents=True, exist_ok=True)
+            return f"sqlite:///{abs_path.as_posix()}"
+        return self.DATABASE_URL
 
     def ensure_directories(self) -> None:
         """Ensure necessary storage directories exist."""
