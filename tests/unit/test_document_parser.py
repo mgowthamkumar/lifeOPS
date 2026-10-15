@@ -27,8 +27,17 @@ def test_extract_csv_with_leading_blank_rows():
         assert "Role: AI Engineer, Skill: Python and RAG, Deadline: 2026-11-01" in text
         assert "Role: Data Scientist, Skill: SQL and Statistics, Deadline: 2026-12-01" in text
     finally:
-        if temp_csv_path.exists():
-            temp_csv_path.unlink()
+        try:
+            if temp_csv_path.exists():
+                temp_csv_path.unlink()
+        except PermissionError:
+            import gc, time
+            gc.collect()
+            time.sleep(0.05)
+            try:
+                temp_csv_path.unlink(missing_ok=True)
+            except Exception:
+                pass
 
 def test_extract_plain_text_and_cleaning():
     with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False, encoding="utf-8") as f:
@@ -42,5 +51,14 @@ def test_extract_plain_text_and_cleaning():
         assert "\x00" not in text
         assert "Line 1\n\nLine 2 with spaces" in text
     finally:
-        if temp_txt_path.exists():
-            temp_txt_path.unlink()
+        try:
+            if temp_txt_path.exists():
+                temp_txt_path.unlink()
+        except PermissionError:
+            import gc, time
+            gc.collect()
+            time.sleep(0.05)
+            try:
+                temp_txt_path.unlink(missing_ok=True)
+            except Exception:
+                pass

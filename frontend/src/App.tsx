@@ -3,29 +3,35 @@ import {
   Activity,
   AlertCircle,
   Brain,
-  CheckCircle2,
   Compass,
-  Cpu,
   Database,
   GitBranch,
   History,
-  Layers,
   ListTodo,
   RefreshCw,
   Search,
-  Server,
   Settings,
-  ShieldCheck,
   Target,
   Zap,
+  Sparkles,
 } from 'lucide-react';
 import { apiService } from './services/api';
 import type { HealthResponse, NavTab } from './types';
 import KnowledgeBase from './features/knowledge/KnowledgeBase';
 import { RAGInterface } from './features/rag/RAGInterface';
+import { GoalsManager } from './features/goals/GoalsManager';
+import { TasksManager } from './features/tasks/TasksManager';
+import { ActionPlanner } from './features/action_planner/ActionPlanner';
+import { DecisionWorkspace } from './features/decisions/DecisionWorkspace';
+import { WhatIfSimulator } from './features/scenarios/WhatIfSimulator';
+import { EvidenceExplorer } from './features/evidence/EvidenceExplorer';
+import { Dashboard } from './features/dashboard/Dashboard';
+import { DecisionHistory } from './features/history/DecisionHistory';
+import { SettingsManager } from './features/settings/SettingsManager';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
+  const [tasksGoalFilter, setTasksGoalFilter] = useState<string | undefined>(undefined);
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [loadingHealth, setLoadingHealth] = useState<boolean>(true);
   const [healthError, setHealthError] = useState<string | null>(null);
@@ -53,16 +59,17 @@ export default function App() {
   }, []);
 
   const navItems: { id: NavTab; label: string; icon: React.ReactNode; badge?: string }[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: <Activity className="w-5 h-5" /> },
-    { id: 'knowledge', label: 'Knowledge Base', icon: <Database className="w-5 h-5" /> },
+    { id: 'dashboard', label: 'Dashboard', icon: <Activity className="w-5 h-5" />, badge: 'LIVE' },
+    { id: 'knowledge', label: 'Knowledge Base', icon: <Database className="w-5 h-5" />, badge: 'LIVE' },
     { id: 'rag', label: 'RAG Intelligence', icon: <Zap className="w-5 h-5" />, badge: 'LIVE' },
-    { id: 'tasks', label: 'Tasks', icon: <ListTodo className="w-5 h-5" /> },
-    { id: 'goals', label: 'Goals', icon: <Target className="w-5 h-5" /> },
-    { id: 'decisions', label: 'Decision Workspace', icon: <Compass className="w-5 h-5" /> },
-    { id: 'scenarios', label: 'What-If Simulator', icon: <GitBranch className="w-5 h-5" /> },
-    { id: 'evidence', label: 'Evidence Explorer', icon: <Search className="w-5 h-5" /> },
-    { id: 'history', label: 'Decision History', icon: <History className="w-5 h-5" /> },
-    { id: 'settings', label: 'Settings', icon: <Settings className="w-5 h-5" /> },
+    { id: 'planner', label: 'AI Action Planner', icon: <Sparkles className="w-5 h-5" />, badge: 'AI' },
+    { id: 'tasks', label: 'Tasks', icon: <ListTodo className="w-5 h-5" />, badge: 'LIVE' },
+    { id: 'goals', label: 'Goals', icon: <Target className="w-5 h-5" />, badge: 'LIVE' },
+    { id: 'decisions', label: 'Decision Workspace', icon: <Compass className="w-5 h-5" />, badge: 'LIVE' },
+    { id: 'scenarios', label: 'What-If Simulator', icon: <GitBranch className="w-5 h-5" />, badge: 'SIGNATURE' },
+    { id: 'evidence', label: 'Evidence Explorer', icon: <Search className="w-5 h-5" />, badge: 'AUDIT' },
+    { id: 'history', label: 'Decision History', icon: <History className="w-5 h-5" />, badge: 'AUDIT' },
+    { id: 'settings', label: 'Settings', icon: <Settings className="w-5 h-5" />, badge: 'SYSTEM' },
   ];
 
   return (
@@ -233,189 +240,39 @@ export default function App() {
           )}
 
           {/* Module Content */}
-          {activeTab === 'dashboard' && (
-            <div className="space-y-6">
-              {/* Foundation Welcome Hero */}
-              <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-[#0e1629] to-slate-900 border border-slate-800 shadow-xl">
-                <div className="max-w-3xl">
-                  <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-medium mb-3">
-                    <ShieldCheck className="w-3.5 h-3.5" /> Core Architecture Verified
-                  </div>
-                  <h2 className="text-2xl font-bold tracking-tight text-white">
-                    LifeOps AI Operational Foundation
-                  </h2>
-                  <p className="text-sm text-slate-400 mt-2 leading-relaxed">
-                    Personal Life Decision and Action Intelligence System built on Explainable Retrieval-Augmented Generation. Every user action connects directly to the persistent backend, ChromaDB vector retrieval, and decision engines.
-                  </p>
-                </div>
-              </div>
-
-              {/* Real Connection Telemetry Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-                  <div className="flex items-center justify-between text-slate-400 mb-2">
-                    <span className="text-xs font-medium">Backend Service</span>
-                    <Server className="w-4 h-4 text-cyan-400" />
-                  </div>
-                  <div className="text-lg font-bold text-white flex items-center gap-2">
-                    {health ? (
-                      <>
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                        <span>FastAPI {health.version}</span>
-                      </>
-                    ) : (
-                      <span className="text-slate-500 text-sm">Connecting...</span>
-                    )}
-                  </div>
-                  <p className="text-[11px] text-slate-500 mt-1">Environment: {health?.environment || '...'}</p>
-                </div>
-
-                <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-                  <div className="flex items-center justify-between text-slate-400 mb-2">
-                    <span className="text-xs font-medium">Relational Storage</span>
-                    <Database className="w-4 h-4 text-indigo-400" />
-                  </div>
-                  <div className="text-lg font-bold text-white flex items-center gap-2">
-                    {health?.database.connected ? (
-                      <>
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                        <span>{health.database.type.toUpperCase()}</span>
-                      </>
-                    ) : (
-                      <span className="text-slate-500 text-sm">Unconnected</span>
-                    )}
-                  </div>
-                  <p className="text-[11px] text-slate-500 mt-1">{health?.database.message || 'SQLite persistent storage'}</p>
-                </div>
-
-                <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-                  <div className="flex items-center justify-between text-slate-400 mb-2">
-                    <span className="text-xs font-medium">Vector Database</span>
-                    <Layers className="w-4 h-4 text-purple-400" />
-                  </div>
-                  <div className="text-lg font-bold text-white flex items-center gap-2">
-                    {health?.vector_db.configured ? (
-                      <>
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                        <span>ChromaDB</span>
-                      </>
-                    ) : (
-                      <span className="text-slate-500 text-sm">Standby</span>
-                    )}
-                  </div>
-                  <p className="text-[11px] text-slate-500 mt-1">{health?.vector_db.status || 'Ready for embeddings'}</p>
-                </div>
-
-                <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-                  <div className="flex items-center justify-between text-slate-400 mb-2">
-                    <span className="text-xs font-medium">AI Reasoning Engine</span>
-                    <Cpu className="w-4 h-4 text-cyan-400" />
-                  </div>
-                  <div className="text-lg font-bold text-white flex items-center gap-2">
-                    <span>{health?.llm.provider || 'Gemini'}</span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 mt-1">Model: {health?.llm.model || 'gemini-2.5-flash'}</p>
-                </div>
-              </div>
-
-              {/* End-to-End Pipeline Visualization */}
-              <div className="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-4">
-                <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">
-                  Operational Architecture Pipeline
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-7 gap-2 items-center text-center text-xs">
-                  <div className="p-3 bg-slate-800/60 border border-slate-700/60 rounded-lg">
-                    <div className="font-semibold text-slate-200">1. User Action</div>
-                    <div className="text-[10px] text-slate-400 mt-1">Upload / Decision / Query</div>
-                  </div>
-                  <div className="text-slate-600 font-bold hidden md:block">→</div>
-                  <div className="p-3 bg-slate-800/60 border border-slate-700/60 rounded-lg">
-                    <div className="font-semibold text-slate-200">2. React + TS</div>
-                    <div className="text-[10px] text-slate-400 mt-1">State & Telemetry UI</div>
-                  </div>
-                  <div className="text-slate-600 font-bold hidden md:block">→</div>
-                  <div className="p-3 bg-slate-800/60 border border-slate-700/60 rounded-lg">
-                    <div className="font-semibold text-slate-200">3. FastAPI API</div>
-                    <div className="text-[10px] text-slate-400 mt-1">Validation & Services</div>
-                  </div>
-                  <div className="text-slate-600 font-bold hidden md:block">→</div>
-                  <div className="p-3 bg-slate-800/60 border border-slate-700/60 rounded-lg">
-                    <div className="font-semibold text-slate-200">4. ChromaDB & RAG</div>
-                    <div className="text-[10px] text-slate-400 mt-1">Vector Search + Gemini</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Modules Roadmap Checklist for Subsequent Phases */}
-              <div className="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-4">
-                <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">
-                  Development Roadmap & Module Status
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                  <div className="p-3.5 rounded-lg bg-emerald-950/20 border border-emerald-800/40 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-emerald-300">Phase 1: Foundation</span>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-900/60 text-emerald-300 font-bold">COMPLETED</span>
-                    </div>
-                    <p className="text-[11px] text-slate-400">
-                      FastAPI backend, React TS shell, SQLite database engine, Live Health API, CORS proxy.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-emerald-950/20 border border-emerald-800/40 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-emerald-300">Phase 2: Database & Models</span>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-900/60 text-emerald-300 font-bold">COMPLETED</span>
-                    </div>
-                    <p className="text-[11px] text-slate-400">
-                      Collections, Documents, Tasks, Goals, Decisions, Scenarios, Evidence tables & repositories.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-emerald-950/20 border border-emerald-800/40 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-emerald-300">Phase 3: Document Ingestion</span>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-900/60 text-emerald-300 font-bold">COMPLETED</span>
-                    </div>
-                    <p className="text-[11px] text-slate-400">
-                      Multi-format parsing (PDF, DOCX, TXT, CSV, MD), chunking, ChromaDB vector indexing & Knowledge Base UI.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-cyan-950/20 border border-cyan-800/40 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-cyan-300">Phase 4: Real RAG</span>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-900/60 text-cyan-300 font-bold">OPERATIONAL</span>
-                    </div>
-                    <p className="text-[11px] text-slate-400">
-                      ChromaDB retrieval, strict relevance filtering, Gemini LLM grounding, anti-hallucination verification.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          {activeTab === 'dashboard' && <Dashboard onNavigate={setActiveTab} />}
 
           {activeTab === 'knowledge' && <KnowledgeBase />}
 
           {activeTab === 'rag' && <RAGInterface />}
 
-          {activeTab !== 'dashboard' && activeTab !== 'knowledge' && activeTab !== 'rag' && (
-            <div className="p-10 rounded-2xl bg-slate-900/50 border border-slate-800 text-center space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto text-cyan-400 border border-slate-700">
-                {navItems.find((item) => item.id === activeTab)?.icon}
-              </div>
-              <h2 className="text-xl font-bold text-white capitalize">
-                {activeTab.replace('-', ' ')} Module Workspace
-              </h2>
-              <p className="text-sm text-slate-400 max-w-lg mx-auto">
-                Foundation and persistence layers are operational. This workspace will be connected in subsequent phases per roadmap.
-              </p>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 font-mono">
-                Status: In Progress
-              </div>
-            </div>
+          {activeTab === 'planner' && <ActionPlanner />}
+
+          {activeTab === 'tasks' && (
+            <TasksManager
+              initialGoalId={tasksGoalFilter}
+              onClearGoalFilter={() => setTasksGoalFilter(undefined)}
+            />
           )}
+
+          {activeTab === 'goals' && (
+            <GoalsManager
+              onSelectGoalForTasks={(goalId) => {
+                setTasksGoalFilter(goalId);
+                setActiveTab('tasks');
+              }}
+            />
+          )}
+
+          {activeTab === 'decisions' && <DecisionWorkspace />}
+
+          {activeTab === 'scenarios' && <WhatIfSimulator />}
+
+          {activeTab === 'evidence' && <EvidenceExplorer />}
+
+          {activeTab === 'history' && <DecisionHistory />}
+
+          {activeTab === 'settings' && <SettingsManager />}
         </div>
       </main>
     </div>

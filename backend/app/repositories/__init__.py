@@ -4,7 +4,9 @@ from app.repositories.collection_repository import CollectionRepository
 from app.repositories.document_repository import DocumentRepository
 from app.repositories.task_goal_repository import GoalRepository, TaskRepository
 from app.repositories.decision_repository import DecisionRepository
-from app.repositories.evidence_repository import EvidenceRepository, ActivityLogRepository
+from app.repositories.scenario_repository import ScenarioRepository
+from app.repositories.evidence_repository import EvidenceRepository, EvidenceInvestigationRepository, ActivityLogRepository
+from app.repositories.action_plan_repository import ActionPlanRepository
 
 __all__ = [
     "BaseRepository",
@@ -14,6 +16,9 @@ __all__ = [
     "GoalRepository",
     "TaskRepository",
     "DecisionRepository",
+    "ScenarioRepository",
     "EvidenceRepository",
+    "EvidenceInvestigationRepository",
     "ActivityLogRepository",
+    "ActionPlanRepository",
 ]

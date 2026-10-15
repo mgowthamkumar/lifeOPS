@@ -1,7 +1,14 @@
-from sqlalchemy import Column, String, Integer, Float, Text, ForeignKey, DateTime
+from sqlalchemy import Column, String, Integer, Float, Text, ForeignKey, DateTime, Table
 from sqlalchemy.orm import relationship
 from app.database.base import Base
 from app.models.base import TimestampMixin, generate_uuid
+
+task_documents = Table(
+    "task_documents",
+    Base.metadata,
+    Column("task_id", String(36), ForeignKey("tasks.id", ondelete="CASCADE"), primary_key=True),
+    Column("document_id", String(36), ForeignKey("documents.id", ondelete="CASCADE"), primary_key=True),
+)
 
 class Goal(Base, TimestampMixin):
     __tablename__ = "goals"
@@ -36,3 +43,4 @@ class Task(Base, TimestampMixin):
     # Relationships
     user = relationship("User", back_populates="tasks")
     goal = relationship("Goal", back_populates="tasks")
+    documents = relationship("Document", secondary=task_documents, backref="tasks")

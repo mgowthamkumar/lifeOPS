@@ -43,6 +43,13 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = "models/text-embedding-004"
     EMBEDDING_BACKEND: str = "local"  # 'local' or 'chroma'
 
+    # Document Chunking and RAG defaults
+    CHUNK_SIZE: int = 500
+    CHUNK_OVERLAP: int = 50
+    DEFAULT_TOP_K: int = 5
+    RELEVANCE_THRESHOLD: float = 0.20
+    VERSION: str = "1.0.0"
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:

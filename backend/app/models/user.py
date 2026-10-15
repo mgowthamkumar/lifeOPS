@@ -17,3 +17,6 @@ class User(Base, TimestampMixin):
     goals = relationship("Goal", back_populates="user", cascade="all, delete-orphan")
     tasks = relationship("Task", back_populates="user", cascade="all, delete-orphan")
     decisions = relationship("Decision", back_populates="user", cascade="all, delete-orphan")
+    action_plans = relationship("ActionPlan", back_populates="user", cascade="all, delete-orphan")
+    scenarios = relationship("Scenario", back_populates="user", cascade="all, delete-orphan")
+    evidence_investigations = relationship("EvidenceInvestigation", back_populates="user", cascade="all, delete-orphan")

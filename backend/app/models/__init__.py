@@ -4,7 +4,8 @@ from app.models.collection import Collection
 from app.models.document import Document, DocumentVersion, DocumentChunk
 from app.models.task_goal import Goal, Task
 from app.models.decision import Decision, DecisionOption, Scenario, ScenarioVariable
-from app.models.evidence_analysis import Evidence, AnalysisResult, ActivityLog
+from app.models.evidence_analysis import Evidence, EvidenceInvestigation, AnalysisResult, ActivityLog
+from app.models.action_plan import ActionPlan, ActionPlanItem
 
 __all__ = [
     "generate_uuid",
@@ -21,6 +22,9 @@ __all__ = [
     "Scenario",
     "ScenarioVariable",
     "Evidence",
+    "EvidenceInvestigation",
     "AnalysisResult",
     "ActivityLog",
+    "ActionPlan",
+    "ActionPlanItem",
 ]

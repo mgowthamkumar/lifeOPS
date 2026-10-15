@@ -1,8 +1,11 @@
+import logging
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 import chromadb
 from chromadb.config import Settings as ChromaSettings
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 class VectorStoreService:
     """Manages persistent ChromaDB vector storage."""
@@ -73,14 +76,21 @@ class VectorStoreService:
         where_metadata: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Perform semantic search using query embeddings and optional metadata filter."""
-        collection = self.get_or_create_collection(collection_name)
-        query_args = {
-            "query_embeddings": query_embeddings,
-            "n_results": n_results,
-        }
-        if where_metadata:
-            query_args["where"] = where_metadata
-        return collection.query(**query_args)
+        empty_res = {"ids": [[]], "distances": [[]], "metadatas": [[]], "documents": [[]]}
+        try:
+            collection = self.get_or_create_collection(collection_name)
+            if collection.count() == 0:
+                return empty_res
+            query_args = {
+                "query_embeddings": query_embeddings,
+                "n_results": min(n_results, collection.count()),
+            }
+            if where_metadata:
+                query_args["where"] = where_metadata
+            return collection.query(**query_args)
+        except Exception as e:
+            logger.warning(f"ChromaDB query failed on collection '{collection_name}': {e}")
+            return empty_res
 
     def delete_chunks(self, collection_name: str, ids: List[str]) -> None:
         """Delete specific chunks by ID."""
