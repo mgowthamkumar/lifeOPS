@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     LLM_MODEL: str = "gemini-2.5-flash"
     EMBEDDING_MODEL: str = "models/text-embedding-004"
+    EMBEDDING_BACKEND: str = "local"  # 'local' or 'chroma'
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { apiService } from './services/api';
 import type { HealthResponse, NavTab } from './types';
+import KnowledgeBase from './features/knowledge/KnowledgeBase';
+import { RAGInterface } from './features/rag/RAGInterface';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
@@ -53,6 +55,7 @@ export default function App() {
   const navItems: { id: NavTab; label: string; icon: React.ReactNode; badge?: string }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <Activity className="w-5 h-5" /> },
     { id: 'knowledge', label: 'Knowledge Base', icon: <Database className="w-5 h-5" /> },
+    { id: 'rag', label: 'RAG Intelligence', icon: <Zap className="w-5 h-5" />, badge: 'LIVE' },
     { id: 'tasks', label: 'Tasks', icon: <ListTodo className="w-5 h-5" /> },
     { id: 'goals', label: 'Goals', icon: <Target className="w-5 h-5" /> },
     { id: 'decisions', label: 'Decision Workspace', icon: <Compass className="w-5 h-5" /> },
@@ -359,23 +362,33 @@ export default function App() {
                     </p>
                   </div>
 
-                  <div className="p-3.5 rounded-lg bg-slate-800/30 border border-slate-800 space-y-1">
+                  <div className="p-3.5 rounded-lg bg-emerald-950/20 border border-emerald-800/40 space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-300">Phase 2: Database & Models</span>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 font-medium">NEXT</span>
+                      <span className="font-semibold text-emerald-300">Phase 2: Database & Models</span>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-900/60 text-emerald-300 font-bold">COMPLETED</span>
                     </div>
                     <p className="text-[11px] text-slate-400">
-                      Collections, Documents, Tasks, Goals, Decisions, Scenarios, Evidence tables.
+                      Collections, Documents, Tasks, Goals, Decisions, Scenarios, Evidence tables & repositories.
                     </p>
                   </div>
 
-                  <div className="p-3.5 rounded-lg bg-slate-800/30 border border-slate-800 space-y-1">
+                  <div className="p-3.5 rounded-lg bg-emerald-950/20 border border-emerald-800/40 space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-300">Phase 3: Document Ingestion</span>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 font-medium">QUEUED</span>
+                      <span className="font-semibold text-emerald-300">Phase 3: Document Ingestion</span>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-900/60 text-emerald-300 font-bold">COMPLETED</span>
                     </div>
                     <p className="text-[11px] text-slate-400">
-                      Multi-format parsing (PDF, DOCX, TXT, CSV, MD), chunking, hashing, and ChromaDB vector indexing.
+                      Multi-format parsing (PDF, DOCX, TXT, CSV, MD), chunking, ChromaDB vector indexing & Knowledge Base UI.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-lg bg-cyan-950/20 border border-cyan-800/40 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-cyan-300">Phase 4: Real RAG</span>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-900/60 text-cyan-300 font-bold">OPERATIONAL</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">
+                      ChromaDB retrieval, strict relevance filtering, Gemini LLM grounding, anti-hallucination verification.
                     </p>
                   </div>
                 </div>
@@ -383,7 +396,11 @@ export default function App() {
             </div>
           )}
 
-          {activeTab !== 'dashboard' && (
+          {activeTab === 'knowledge' && <KnowledgeBase />}
+
+          {activeTab === 'rag' && <RAGInterface />}
+
+          {activeTab !== 'dashboard' && activeTab !== 'knowledge' && activeTab !== 'rag' && (
             <div className="p-10 rounded-2xl bg-slate-900/50 border border-slate-800 text-center space-y-4">
               <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto text-cyan-400 border border-slate-700">
                 {navItems.find((item) => item.id === activeTab)?.icon}
@@ -392,10 +409,10 @@ export default function App() {
                 {activeTab.replace('-', ' ')} Module Workspace
               </h2>
               <p className="text-sm text-slate-400 max-w-lg mx-auto">
-                Foundation structure is established. Live backend telemetry confirmed. Per Phase 1 requirements, this module will be connected to its dedicated business service and persistent tables in the upcoming phase.
+                Foundation and persistence layers are operational. This workspace will be connected in subsequent phases per roadmap.
               </p>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 font-mono">
-                Status: Ready for Phase 2 implementation
+                Status: In Progress
               </div>
             </div>
           )}
